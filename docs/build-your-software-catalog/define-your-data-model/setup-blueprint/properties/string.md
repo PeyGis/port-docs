@@ -26,7 +26,7 @@ In this [live demo](https://demo.getport.io/services) example, we can see the `L
 
 ## API definition
 
-<Tabs groupId="api-definition" defaultValue="basic" values={[
+<Tabs groupId="api-definition" queryString defaultValue="basic" values={[
 {label: "Basic", value: "basic"},
 {label: "Enum", value: "enum"},
 {label: "Array", value: "array"}
@@ -94,7 +94,7 @@ In this [live demo](https://demo.getport.io/services) example, we can see the `L
 
 ## Terraform definition
 
-<Tabs groupId="tf-definition" defaultValue="basic" values={[
+<Tabs groupId="tf-definition" queryString defaultValue="basic" values={[
 {label: "Basic", value: "basic"},
 {label: "Enum", value: "enum"},
 {label: "Array", value: "array"}
@@ -176,7 +176,7 @@ resource "port_blueprint" "myBlueprint" {
 
 ## Pulumi definition
 
-<Tabs groupId="pulumi-definition" defaultValue="basic" values={[
+<Tabs groupId="pulumi-definition" queryString defaultValue="basic" values={[
 {label: "Basic", value: "basic"},
 {label: "Enum", value: "enum"},
 {label: "Array - coming soon", value: "array"}
@@ -184,7 +184,7 @@ resource "port_blueprint" "myBlueprint" {
 
 <TabItem value="basic">
 
-<Tabs groupId="pulumi-definition-string-basic" defaultValue="python" values={[
+<Tabs groupId="pulumi-definition-string-basic" queryString defaultValue="python" values={[
 {label: "Python", value: "python"},
 {label: "TypeScript", value: "typescript"},
 {label: "JavaScript", value: "javascript"},
@@ -197,23 +197,21 @@ resource "port_blueprint" "myBlueprint" {
 """A Python Pulumi program"""
 
 import pulumi
-from port_pulumi import Blueprint
+from port_pulumi import Blueprint,BlueprintPropertiesArgs,BlueprintPropertiesStringPropsArgs
 
 blueprint = Blueprint(
     "myBlueprint",
     identifier="myBlueprint",
     title="My Blueprint",
     # highlight-start
-    properties=[
-      {
-        "type": "string",
-        "identifier": "myStringProp",
-        "title": "My String",
-        "required": True
-      }
-    ],
+    properties=BlueprintPropertiesArgs(
+        string_props={
+            "myStringProp": BlueprintPropertiesStringPropsArgs(
+                title="My string", required=False
+            )
+    ),
     # highlight-end
-    relations=[]
+    relations={}
 )
 ```
 
@@ -229,14 +227,14 @@ export const blueprint = new port.Blueprint("myBlueprint", {
   identifier: "myBlueprint",
   title: "My Blueprint",
   // highlight-start
-  properties: [
-    {
-      identifier: "myStringProp",
-      title: "My String",
-      type: "string",
-      required: true,
+  properties: {
+    stringProps: {
+      myStringProp: {
+        title: "My string",
+        required: true,
+      },
     },
-  ],
+  },
   // highlight-end
 });
 ```
@@ -254,16 +252,16 @@ const entity = new port.Blueprint("myBlueprint", {
   title: "My Blueprint",
   identifier: "myBlueprint",
   // highlight-start
-  properties: [
-    {
-      identifier: "myStringProp",
-      title: "My String",
-      type: "string",
-      required: true,
+  properties: {
+    stringProps: {
+      myStringProp: {
+        title: "My string",
+        required: true,
+      },
     },
-  ],
+  },
   // highlight-end
-  relations: [],
+  relations: {},
 });
 
 exports.title = entity.title;
@@ -286,13 +284,13 @@ func main() {
 			Identifier: pulumi.String("myBlueprint"),
 			Title:      pulumi.String("My Blueprint"),
       // highlight-start
-			Properties: port.BlueprintPropertyArray{
-				&port.BlueprintPropertyArgs{
-					Identifier: pulumi.String("myStringProp"),
-					Title:      pulumi.String("My String"),
-					Required:   pulumi.Bool(false),
-					Type:       pulumi.String("string"),
-				},
+			Properties: port.BlueprintPropertiesArgs{
+				StringProps: port.BlueprintPropertiesStringPropsMap{
+					"myStringProp": &port.BlueprintPropertiesStringPropsArgs{
+                        Title:      pulumi.String("My String"),
+                        Required:   pulumi.Bool(true),
+                    },
+                },
 			},
       // highlight-end
 		})
@@ -313,7 +311,7 @@ func main() {
 
 <TabItem value="enum">
 
-<Tabs groupId="pulumi-definition-string-enum" defaultValue="python" values={[
+<Tabs groupId="pulumi-definition-string-enum" queryString defaultValue="python" values={[
 {label: "Python", value: "python"},
 {label: "TypeScript", value: "typescript"},
 {label: "JavaScript", value: "javascript"},
@@ -326,26 +324,28 @@ func main() {
 """A Python Pulumi program"""
 
 import pulumi
-from port_pulumi import Blueprint
+from port_pulumi import Blueprint,BlueprintPropertiesArgs
 
 blueprint = Blueprint(
     "myBlueprint",
     identifier="myBlueprint",
     title="My Blueprint",
     # highlight-start
-    properties=[{
-      "type": "string",
-      "identifier": "myStringProp",
-      "title": "My String",
-      "required": True,
-      "enum": ["my-option-1", "my-option-2"],
-      "enum_colors": {
-        "my-option-1": "red",
-        "my-option-2": "green"
-      }
-    }],
+    properties=BlueprintPropertiesArgs(
+        string_props={
+            "myStringProp": {
+                "title": "My String",
+                "required": True,
+                "enum": ["my-option-1", "my-option-2"],
+                "enum_colors": {
+                    "my-option-1": "red",
+                    "my-option-2": "green"
+                }
+            }
+        }
+    ),
     # highlight-end
-    relations=[]
+    relations={}
 )
 ```
 
@@ -361,19 +361,19 @@ export const blueprint = new port.Blueprint("myBlueprint", {
   identifier: "myBlueprint",
   title: "My Blueprint",
   // highlight-start
-  properties: [
-    {
-      identifier: "myStringProp",
-      title: "My String",
-      type: "string",
-      required: true,
-      enums: ["my-option-1", "my-option-2"],
-      enumColors: {
-        "my-option-1": "red",
-        "my-option-2": "green",
+  properties: {
+    stringProps: {
+      myStringProp: {
+        title: "My String",
+        required: true,
+        enums: ["my-option-1", "my-option-2"],
+        enumColors: {
+          "my-option-1": "red",
+          "my-option-2": "green",
+        },
       },
     },
-  ],
+  },
   // highlight-end
 });
 ```
@@ -391,21 +391,21 @@ const entity = new port.Blueprint("myBlueprint", {
   title: "My Blueprint",
   identifier: "myBlueprint",
   // highlight-start
-  properties: [
-    {
-      identifier: "myStringProp",
-      title: "My String",
-      type: "string",
-      required: true,
-      enums: ["my-option-1", "my-option-2"],
-      enumColors: {
-        "my-option-1": "red",
-        "my-option-2": "green",
+  properties: {
+    stringProps: {
+      myStringProp: {
+        title: "My String",
+        required: true,
+        enums: ["my-option-1", "my-option-2"],
+        enumColors: {
+          "my-option-1": "red",
+          "my-option-2": "green",
+        },
       },
     },
-  ],
+  },
   // highlight-end
-  relations: [],
+  relations: {},
 });
 
 exports.title = entity.title;
@@ -428,21 +428,22 @@ func main() {
 			Identifier: pulumi.String("myBlueprint"),
 			Title:      pulumi.String("My Blueprint"),
       // highlight-start
-			Properties: port.BlueprintPropertyArray{
-				&port.BlueprintPropertyArgs{
-					Identifier: pulumi.String("myStringProp"),
-					Title:      pulumi.String("My String"),
-					Required:   pulumi.Bool(false),
-					Type:       pulumi.String("string"),
-					Enums: pulumi.StringArray{
-						pulumi.String("my-option-1"),
-						pulumi.String("my-option-2"),
-					},
-					EnumColors: pulumi.StringMap{
-						"my-option-1": pulumi.String("red"),
-						"my-option-2": pulumi.String("green"),
-					},
-				},
+			Properties: port.BlueprintPropertiesArgs{
+				StringProps: port.BlueprintPropertiesStringPropsMap{
+					"myStringProp": port.BlueprintPropertiesStringPropsArgs{
+                        Title:      pulumi.String("My String"),
+                        Required:   pulumi.Bool(false),
+                        Type:       pulumi.String("string"),
+                        Enums: pulumi.StringArray{
+                            pulumi.String("my-option-1"),
+                            pulumi.String("my-option-2"),
+                        },
+                        EnumColors: pulumi.StringMap{
+                            "my-option-1": pulumi.String("red"),
+                            "my-option-2": pulumi.String("green"),
+                        },
+                    },
+                },
 			},
       // highlight-end
 		})
@@ -471,7 +472,7 @@ String validations support the following operators:
 - `maxLength` - enforce maximal string length;
 - `pattern` - enforce Regex patterns.
 
-<Tabs groupId="validation-definition" defaultValue="basic" values={[
+<Tabs groupId="validation-definition" queryString defaultValue="basic" values={[
 {label: "Basic", value: "basic"},
 {label: "Array", value: "array"},
 {label: "Terraform", value: "tf"},
